@@ -10,6 +10,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.util.Log;
+import ca.ualberta.cs.lonelytwitter.Summary;
 import ca.ualberta.cs.lonelytwitter.Tweet;
 
 import com.google.gson.Gson;
@@ -53,8 +54,7 @@ public class GsonDataManager implements IDataManager {
 
 	public void saveTweets(List<Tweet> lts) {
 		try {
-			FileOutputStream fos = ctx.openFileOutput(FILENAME,
-					Context.MODE_PRIVATE);
+			FileOutputStream fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE);
 
 			String jsonTweetList = gson.toJson(lts);
 			fos.write(jsonTweetList.getBytes());
@@ -65,4 +65,42 @@ public class GsonDataManager implements IDataManager {
 			e.printStackTrace();
 		}
 	}
+	
+	public Summary loadsum(){
+		Summary lts = new Summary();
+
+		try {
+			BufferedReader input = new BufferedReader(new InputStreamReader(
+					ctx.openFileInput(FILENAME)));
+			String line;
+			StringBuffer fileContent = new StringBuffer();
+
+			while ((line = input.readLine()) != null) {
+				fileContent.append(line);
+			}
+
+			Type collectionType = new TypeToken<Summary>() {}.getType();
+			lts = gson.fromJson(fileContent.toString(), collectionType);
+
+		} catch (Exception e) {
+			Log.i("LonelyTwitter", "Error loading Sum");
+			e.printStackTrace();
+		}
+		return lts;
+	}
+	
+	public void saveSum(Summary lts) {
+		try {
+			FileOutputStream fos = ctx.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+
+			String jsonSum = gson.toJson(lts);
+			fos.write(jsonSum.getBytes());
+			fos.close();
+			
+			Log.i("Persistence", "Saved: " + jsonSum);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }
